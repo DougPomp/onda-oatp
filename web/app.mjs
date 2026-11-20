@@ -26,6 +26,7 @@ function controls(){
   $('msg').setAttribute('aria-pressed',kind==='message');$('bin').setAttribute('aria-pressed',kind==='file');
   $('picker').hidden=kind!=='file';$('text').hidden=kind!=='message';
   $('repair').hidden=!!job || !prepared;
+  $('forget').hidden=!!job || !receiver.key || receiver.failed || !!receiver.object;
   $('stop').hidden=!job;$('stop').textContent=tab==='recv'?'Parar de ouvir':'Parar transmissão';
   $('listen').disabled=!!job || !api;$('transmit').disabled=!!job || !api || !inputSize().valid;
   $('led').classList.toggle('on',!!job);$('scopeLabel').textContent=job?(tab==='send'?'TRANSMISSÃO':'MICROFONE'):'EM ESPERA';
@@ -44,7 +45,7 @@ function preview(){
   const count=1+symbols+Math.ceil(symbols/8);
   const seconds=Math.ceil(count*(frameTime+GAP)-GAP);
   $('estimate').textContent=!valid?(bytes>LIMIT?'Limite excedido':'Selecione um conteúdo válido'):
-    frameTime?'Inicial ≈ '+Math.floor(seconds/60)+' min '+(seconds%60)+' s':'Calculando duração…';
+    frameTime?'Inicial ≈ '+(seconds>=60?Math.floor(seconds/60)+' min ':'')+(seconds%60)+' s':'Calculando duração…';
   controls();
 }
 function inputChanged(){prepared=null;preview();if(!job && api)status('Pronto para transmitir');}
@@ -174,6 +175,9 @@ async function startReceive(){
     e.name==='NotAllowedError'?'Permita o microfone nas configurações deste site e toque em Receber pelo microfone.':e.message);}}
 }
 $('listen').onclick=startReceive;
+$('forget').onclick=()=>{
+  receiver=new Receiver();controls();status('Pronto para receber','Toque em Receber pelo microfone para iniciar outra transferência.');
+};
 draw();preview();
 try{
   api=await window.ggwave_factory({print:()=>{}});api.disableLog();

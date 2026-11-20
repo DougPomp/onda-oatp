@@ -1,7 +1,7 @@
 import {utf8,digest,concat,addScaled,coefficients,insert} from './algebra.mjs';
 
 export const LIMIT = 4096;
-const MAX_OBJECT = LIMIT + 263;
+const MAX_OBJECT = LIMIT + 7 + 255;
 const same = (a,b) => a.length === b.length && a.every((v,i)=>v === b[i]);
 const view = a => new DataView(a.buffer,a.byteOffset,a.byteLength);
 const params = Uint8Array.of(1,1,0,64,0,64,0,0);

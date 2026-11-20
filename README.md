@@ -33,6 +33,8 @@ Cada quadro OATP de 100 bytes viaja como 136 caracteres Base64 canônicos com pa
 
 A CI verifica o caminho bytes → PCM → bytes, perda do manifesto inicial, repetição de manifesto, reparos, integridade, mensagens Unicode, arquivos e compatibilidade byte a byte com as referências. A etapa de publicação distribui apenas os arquivos estáticos em dist.
 
+Em teste de navegador, o Edge com viewport móvel recebeu pelo microfone virtual um WAV com a mensagem “Olá, Onda! 🌊” e outro com o arquivo binário de 256 bytes. A cópia e o download coincidiram com os originais. Também foram exercitados cancelamento da reprodução, continuação com reparos e permissão de microfone negada. A primeira sequência de “Olá, Onda!” dura aproximadamente 54 segundos no perfil inicial.
+
 **Ensaio físico previsto:** em Safari/iPhone e Chrome/Android, trocar “Olá, Onda!” e um arquivo com os bytes 00 a FF, em ambos os sentidos. Anotar modelo, navegador, distância, duração, necessidade de reparos e comparação do arquivo recebido. Publicar resultados medidos separadamente dos testes de software.
 
 ## Licença

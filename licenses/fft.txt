@@ -1,0 +1,3 @@
+FFT routines included in ggwave
+Copyright Takuya OOURA, 1996-2001
+https://www.kurims.kyoto-u.ac.jp/~ooura/fft.html
