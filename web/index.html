@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1924"><title>Onda · Transferência por som</title>
+<link rel="icon" href="./logo.svg"><link rel="stylesheet" href="./onda.css"><script defer src="./vendor/ggwave.js"></script><script type="module" src="./app.mjs"></script></head>
+<body><header><nav><a class="brand" href="./"><img src="./logo.svg" alt="">Onda</a><div><a href="./laboratorio/">Laboratório</a><a href="https://github.com/DougPomp/onda-oatp">GitHub</a></div></nav></header>
+<main><div class="hero"><div><h1>Transferência <em>por som.</em></h1>
+<p>Abra o Onda nos dois aparelhos. Toque em <strong>Receber</strong> no outro celular antes de transmitir.</p></div>
+<button id="share" class="share">Abrir em outro celular</button></div>
+<div class="console"><section class="card"><div class="tabs" aria-label="Modo"><button id="sendTab" aria-pressed="true">Transmitir</button><button id="recvTab" aria-pressed="false">Receber</button></div>
+<div id="sendPanel"><h2>O que você quer enviar?</h2><div class="choices"><button id="msg" aria-pressed="true">Mensagem</button><button id="bin" aria-pressed="false">Arquivo</button></div>
+<label for="text" class="sr">Mensagem</label><textarea id="text" rows="4" placeholder="Escreva ou cole sua mensagem…">Olá, Onda!</textarea>
+<label id="picker" hidden>Escolha um arquivo de até 4 KiB<input type="file" id="file"></label>
+<div class="meta"><span id="size"></span><span id="estimate"></span></div>
+<button class="primary" id="transmit">Transmitir</button><button class="secondary" id="repair" hidden>Continuar com reparos</button></div>
+<div id="recvPanel" hidden><h2>Escutar o outro aparelho</h2><p>Deixe o microfone perto do alto-falante do emissor e mantenha esta página aberta.</p><button class="primary listen" id="listen">Receber pelo microfone</button>
+<div id="output" hidden><h3>Conteúdo verificado</h3><pre id="content"></pre><button id="copy" class="secondary" hidden>Copiar mensagem</button><a id="download" hidden>Baixar arquivo</a></div></div>
+<button id="stop" class="secondary" hidden>Parar</button></section>
+<aside class="monitor"><div class="monitor-head"><h2>Monitor de áudio</h2><span class="led" id="led"></span></div>
+<div class="scope"><canvas id="scope" width="640" height="200" aria-label="Forma de onda do áudio"></canvas><span id="scopeLabel">EM ESPERA</span></div>
+<div class="readout"><small>Estado</small><strong id="status" role="status">Preparando modem…</strong></div>
+<div class="meter"><div id="bar"></div></div><p id="detail"></p>
+</aside></div>
+<footer><span>Onda · OATP 0.1 experimental</span><a href="./NOTICE.txt">Licenças</a></footer></main>
+<dialog id="dialog"><form method="dialog"><h2>Abra no outro celular</h2><p>Use a câmera para abrir a mesma página e toque em Receber.</p><img src="./qr.svg" alt="QR code para a página pública do Onda" width="190" height="190"><p><a href="https://dougpomp.github.io/onda-oatp/">dougpomp.github.io/onda-oatp</a></p><button class="secondary">Fechar</button></form></dialog></body></html>
