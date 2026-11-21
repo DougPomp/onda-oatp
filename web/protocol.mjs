@@ -58,18 +58,20 @@ export async function sender(data,tag=new Uint8Array(16)) {
   }
   if(n%8) schedule.push(manifest);
   let position=0;
-  return {initial:schedule,async repairs(){
-    const batch=[manifest];
-    if(!sizes.length)return batch;
-    for(let i=0;i<8;i++){
+  async function nextRepairs(count){
+    const batch=[];
+    for(let i=0;i<count && sizes.length;i++){
       const round=Math.floor(position/sizes.length);
       const g=(position%sizes.length+round)%sizes.length;
       if(limits[g]+round>0xffffffff) throw Error('Sequência de reparos esgotada.');
       batch.push(await symbol(g,limits[g]+round));position++;
     }
-    batch.push(manifest);return batch;
-  }};
+    return batch;
+  }
+  return {initial:schedule, extraRound:()=>nextRepairs(sizes.length),
+    async repairs(){return [manifest,...await nextRepairs(8),manifest];}};
 }
+
 export class Receiver {
   key=null; groups=[]; rank=0; total=0; packets=0; object=null; failed=false;
   async accept(f) {
@@ -103,5 +105,25 @@ export class Receiver {
       this.failed=true;throw Error('Falha de integridade. Inicie uma nova recepção.');
     }
     this.object=bytes;
+  }
+}
+
+// Audio may lose the opening manifesto while later symbols still arrive intact.
+export class AudioReceiver extends Receiver {
+  pending=[];
+  async accept(f){
+    if(!this.key && f.length===100 && f[6]===2){
+      if(!same(f.subarray(0,8),Uint8Array.of(79,65,84,80,0,1,2,0)) ||
+         view(f).getUint32(24)===0xffffffff || view(f).getUint32(96)!==crc(f.subarray(0,96)))return;
+      if(this.pending.length===128)this.pending.shift();
+      this.pending.push(f.slice());
+      return;
+    }
+    await super.accept(f);
+    if(this.key && this.pending.length){
+      const pending=this.pending;
+      this.pending=[];
+      for(const symbol of pending) if(same(symbol.subarray(8,24),this.key.subarray(0,16)))await super.accept(symbol);
+    }
   }
 }

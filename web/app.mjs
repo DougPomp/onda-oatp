@@ -1,9 +1,10 @@
-import {envelope, unpack, sender, Receiver, LIMIT} from './protocol.mjs';
+import {envelope, unpack, sender, AudioReceiver, LIMIT} from './protocol.mjs';
 import {modem, RATE, GAP} from './modem.mjs';
 
 const $ = id => document.getElementById(id);
 const fmt = n => n.toLocaleString('pt-BR');
-let api, frameTime, tab='send', kind='message', job=null, prepared=null, receiver=new Receiver(), outputUrl;
+let api, tab='send', kind='message', job=null, prepared=null, receiver=new AudioReceiver(), outputUrl;
+const frameTimes={};
 const canvas=$('scope'), pen=canvas.getContext('2d');
 function draw(samples, color='#82f2c3'){
   pen.clearRect(0,0,canvas.width,canvas.height);
@@ -20,7 +21,7 @@ function status(title,detail='',fraction=0){
   $('bar').style.width=100*Math.max(0,Math.min(1,fraction))+'%';
 }
 function controls(){
-  for(const id of ['sendTab','recvTab','msg','bin','text','file']) $(id).disabled=!!job;
+  for(const id of ['sendTab','recvTab','msg','bin','text','file','profile']) $(id).disabled=!!job;
   $('sendPanel').hidden=tab!=='send';$('recvPanel').hidden=tab!=='recv';
   $('sendTab').setAttribute('aria-pressed',tab==='send');$('recvTab').setAttribute('aria-pressed',tab==='recv');
   $('msg').setAttribute('aria-pressed',kind==='message');$('bin').setAttribute('aria-pressed',kind==='file');
@@ -42,7 +43,10 @@ function preview(){
   $('size').textContent=fmt(bytes)+' / 4.096 bytes';
   let n=Math.ceil((7+nameBytes+bytes)/64), symbols=0;
   while(n>0){const k=Math.min(n,64);symbols+=k+Math.ceil(k/2);n-=k;}
-  const count=1+symbols+Math.ceil(symbols/8);
+  const profile=$('profile').value;
+  const frameTime=frameTimes[profile];
+  const extra=profile==='normal'?Math.ceil((7+nameBytes+bytes)/4096):0;
+  const count=1+symbols+Math.ceil(symbols/8)+extra;
   const seconds=Math.ceil(count*(frameTime+GAP)-GAP);
   $('estimate').textContent=!valid?(bytes>LIMIT?'Limite excedido':'Selecione um conteúdo válido'):
     frameTime?'Inicial ≈ '+(seconds>=60?Math.floor(seconds/60)+' min ':'')+(seconds%60)+' s':'Calculando duração…';
@@ -50,6 +54,7 @@ function preview(){
 }
 function inputChanged(){prepared=null;preview();if(!job && api)status('Pronto para transmitir');}
 $('text').oninput=$('file').onchange=inputChanged;
+$('profile').onchange=preview;
 for(const [id,value] of [['msg','message'],['bin','file']]) $(id).onclick=()=>{kind=value;inputChanged();};
 $('sendTab').onclick=()=>{tab='send';controls();status('Pronto para transmitir');};
 $('recvTab').onclick=()=>{tab='recv';controls();startReceive();};
@@ -111,11 +116,13 @@ async function transmit(repair){
       const tx=await sender(envelope(kind,file?.name || '',bytes),crypto.getRandomValues(new Uint8Array(16)));
       if(job!==j)return;prepared=tx;
     }
-    const frames=repair?await prepared.repairs():prepared.initial;
+    const profile=$('profile').value;
+    const frames=repair?await prepared.repairs():prepared.initial.slice();
+    if(!repair && profile==='normal')frames.push(...await prepared.extraRound());
     for(let i=0;i<frames.length;i++){
       if(job!==j)return;
       status(repair?'Transmitindo reparos':'Transmitindo pelo alto-falante','Quadro '+(i+1)+' de '+frames.length,i/frames.length);
-      await play(j,j.mod.encode(frames[i]));
+      await play(j,j.mod.encode(frames[i],profile));
       if(job!==j)return;
       if(i+1<frames.length)await new Promise(resolve=>setTimeout(resolve,GAP*1000));
     }
@@ -141,7 +148,7 @@ async function startReceive(){
   try{
     if(!navigator.mediaDevices?.getUserMedia)throw Error('Abra a página HTTPS no Safari ou Chrome para ativar o microfone.');
     j=start();if(!j)return;
-    if(receiver.failed || receiver.object)receiver=new Receiver();
+    if(receiver.failed || receiver.object)receiver=new AudioReceiver();
     clearOutput();status('Aguardando microfone…');
     const permission=navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
     const stream=await permission;
@@ -163,7 +170,11 @@ async function startReceive(){
         const frame=j.mod.decode(data);
         if(frame)pending=pending.then(async()=>{
           if(job!==j)return;
-          await receiver.accept(frame);if(job!==j || !receiver.key)return;
+          await receiver.accept(frame);if(job!==j)return;
+          if(!receiver.key){
+            if(receiver.pending.length)status('Símbolos guardados','Aguardando a próxima identificação da transferência.');
+            return;
+          }
           if(receiver.object){
             const item=unpack(receiver.object);end(j);showResult(item);
             status('Conteúdo recebido e verificado','Integridade confirmada com SHA-256.',1);
@@ -176,11 +187,13 @@ async function startReceive(){
 }
 $('listen').onclick=startReceive;
 $('forget').onclick=()=>{
-  receiver=new Receiver();controls();status('Pronto para receber','Toque em Receber pelo microfone para iniciar outra transferência.');
+  receiver=new AudioReceiver();controls();status('Pronto para receber','Toque em Receber pelo microfone para iniciar outra transferência.');
 };
 draw();preview();
 try{
   api=await window.ggwave_factory({print:()=>{}});api.disableLog();
-  const probe=modem(api);try{frameTime=probe.encode(new Uint8Array(100)).length/RATE;}finally{probe.close();}
+  const probe=modem(api);
+  try{for(const option of $('profile').options)frameTimes[option.value]=probe.encode(new Uint8Array(100),option.value).length/RATE;}
+  finally{probe.close();}
   preview();status('Pronto para transmitir','O áudio será reproduzido neste aparelho.');
 }catch(e){api=null;controls();status('Modem indisponível',e.message);}

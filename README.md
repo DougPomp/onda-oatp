@@ -27,13 +27,21 @@ Abra localhost no mesmo computador. Para um celular, use o endereço HTTPS do Pa
 
 O objeto dentro do OATP contém, em sequência, o ASCII ONDA, versão de um byte (1), tipo de um byte (0 = mensagem UTF-8; 1 = arquivo), comprimento do nome em um byte, nome UTF-8 e conteúdo original. Mensagens têm nome vazio. O campo de comprimento do manifesto cobre o envelope inteiro. O limite de 4096 bytes da interface se aplica ao conteúdo. Exemplo: a mensagem A é `4f 4e 44 41 01 00 00 41`.
 
-Cada quadro OATP de 100 bytes viaja como 136 caracteres Base64 canônicos com padding, usando ggwave 0.4.0, modo variável audível normal, PCM mono de saída a 48 kHz. Há uma pausa nominal de 160 ms entre quadros. A primeira sequência segue o perfil inicial da [especificação](OATP_0.1_Especificacao_Completa.md). Cada continuação anuncia o manifesto, transmite oito reparos e repete o manifesto. Os ESIs avançam por geração e o início de cada rodada gira. O receptor descarta símbolos anteriores ao primeiro manifesto válido. Parar a escuta conserva o progresso na aba. Fechar ou recarregar a página encerra a sessão.
+O emissor envia os 100 bytes binários de cada quadro diretamente pelo ggwave 0.4.0 (PCM mono a 48 kHz), com 160 ms entre quadros. Atualize a página nos dois aparelhos. O receptor também aceita o formato Base64 anterior e reconhece os três perfis audíveis automaticamente.
+
+| Perfil | Áudio por quadro | Sequência inicial “Olá, Onda!” |
+|---|---:|---:|
+| Com ruído (normal, um reparo extra por geração) | 9,90 s | ≈ 51 s |
+| Rápido | 6,83 s | ≈ 28 s |
+| Turbo | 3,75 s | ≈ 16 s |
+
+Os tempos são da forma de onda e das pausas, arredondados para cima no painel. A sequência inicial segue a especificação; no perfil Com ruído o emissor acrescenta um reparo por geração após o manifesto final. Se a abertura for perdida, o receptor guarda até 128 símbolos com CRC válido e reaplica os correspondentes quando recebe o manifesto. Se faltar progresso, mantenha o receptor ouvindo e use **Continuar com reparos** no emissor. O perfil pode ser trocado antes da continuação. Recarregar a página encerra a sessão.
 
 ## Validação
 
 A CI verifica o caminho bytes → PCM → bytes, perda do manifesto inicial, repetição de manifesto, reparos, integridade, mensagens Unicode, arquivos e compatibilidade byte a byte com as referências. A etapa de publicação distribui apenas os arquivos estáticos em dist.
 
-Em teste de navegador, o Edge com viewport móvel recebeu pelo microfone virtual um WAV com a mensagem “Olá, Onda! 🌊” e outro com o arquivo binário de 256 bytes. A cópia e o download coincidiram com os originais. Também foram exercitados cancelamento da reprodução, continuação com reparos e permissão de microfone negada. A primeira sequência de “Olá, Onda!” dura aproximadamente 54 segundos no perfil inicial.
+Em teste de navegador, o Edge com viewport móvel recebeu pelo microfone virtual um WAV com a mensagem “Olá, Onda! 🌊” e outro com o arquivo binário de 256 bytes. A cópia e o download coincidiram com os originais. Também foram exercitados cancelamento da reprodução, continuação com reparos e permissão de microfone negada. Os perfis atuais passaram por testes em PCM com interferência harmônica sintética e perda do primeiro marcador. Esses ensaios não estimam a taxa de sucesso com vozes ou latidos reais.
 
 **Ensaio físico previsto:** em Safari/iPhone e Chrome/Android, trocar “Olá, Onda!” e um arquivo com os bytes 00 a FF, em ambos os sentidos. Anotar modelo, navegador, distância, duração, necessidade de reparos e comparação do arquivo recebido. Publicar resultados medidos separadamente dos testes de software.
 
