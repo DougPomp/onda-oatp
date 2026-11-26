@@ -44,6 +44,7 @@ function preview(){
   let n=Math.ceil((7+nameBytes+bytes)/64), symbols=0;
   while(n>0){const k=Math.min(n,64);symbols+=k+Math.ceil(k/2);n-=k;}
   const profile=$('profile').value;
+  $('highHint').hidden=profile!=='high';
   const frameTime=frameTimes[profile];
   const extra=profile==='normal'?Math.ceil((7+nameBytes+bytes)/4096):0;
   const count=1+symbols+Math.ceil(symbols/8)+extra;

@@ -34,6 +34,9 @@ O emissor envia os 100 bytes binários de cada quadro diretamente pelo ggwave 0.
 | Com ruído (normal, um reparo extra por geração) | 9,90 s | ≈ 51 s |
 | Rápido | 6,83 s | ≈ 28 s |
 | Turbo | 3,75 s | ≈ 16 s |
+| Alta frequência (experimental, 15–19,5 kHz) | 9,90 s | ≈ 41 s |
+
+O receptor também detecta Alta frequência automaticamente. Algumas pessoas podem ouvir os tons e a resposta dos alto-falantes e microfones varia entre celulares.
 
 Os tempos são da forma de onda e das pausas, arredondados para cima no painel. A sequência inicial segue a especificação; no perfil Com ruído o emissor acrescenta um reparo por geração após o manifesto final. Se a abertura for perdida, o receptor guarda até 128 símbolos com CRC válido e reaplica os correspondentes quando recebe o manifesto. Se faltar progresso, mantenha o receptor ouvindo e use **Continuar com reparos** no emissor. O perfil pode ser trocado antes da continuação. Recarregar a página encerra a sessão.
 

@@ -11,7 +11,8 @@
 <label for="text" class="sr">Mensagem</label><textarea id="text" rows="4" placeholder="Escreva ou cole sua mensagem…">Olá, Onda!</textarea>
 <label id="picker" hidden>Escolha um arquivo de até 4 KiB<input type="file" id="file"></label>
 <label class="profile">Perfil de áudio
-<select id="profile"><option value="normal">Com ruído · reparo extra</option><option value="fast">Rápido</option><option value="fastest">Turbo · ambiente silencioso</option></select></label>
+<select id="profile"><option value="normal">Com ruído · reparo extra</option><option value="fast">Rápido</option><option value="fastest">Turbo · ambiente silencioso</option><option value="high">Alta frequência · experimental</option></select></label>
+<p id="highHint" hidden>Os tons de 15 a 19,5 kHz podem ser ouvidos por algumas pessoas. A recepção depende dos dois aparelhos.</p>
 <div class="meta"><span id="size"></span><span id="estimate"></span></div>
 <button class="primary" id="transmit">Transmitir</button><button class="secondary" id="repair" hidden>Continuar com reparos</button></div>
 <div id="recvPanel" hidden><h2>Escutar o outro aparelho</h2><p>Deixe o microfone perto do alto-falante do emissor e mantenha esta página aberta.</p><button class="primary listen" id="listen">Receber pelo microfone</button>

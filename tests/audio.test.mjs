@@ -4,7 +4,7 @@ import factory from 'ggwave';
 import {sender,Receiver,AudioReceiver,envelope,unpack} from '../web/protocol.mjs';
 import {modem} from '../web/modem.mjs';
 
-test('entrada tardia, repetição e reparos por áudio real em PCM',async()=>{
+for(const profile of ['normal','high']) test('entrada tardia, repetição e reparos em PCM: '+profile,async()=>{
   const api=await factory({print:()=>{}});api.disableLog();
   const tx=modem(api),rx=modem(api), receiver=new Receiver();
   const bytes=new TextEncoder().encode('Olá, Onda! 🌊');
@@ -12,7 +12,7 @@ test('entrada tardia, repetição e reparos por áudio real em PCM',async()=>{
   const bad=source.initial[0].slice();bad[60]^=1;
   await receiver.accept(bad);assert.equal(receiver.key,null);
   async function play(f){
-    const wave=tx.encode(f);
+    const wave=tx.encode(f,profile);
     let found=0;
     for(let i=0;i<wave.length+8192;i+=1024){
       const input=new Float32Array(1024);input.set(wave.subarray(i,i+1024));
