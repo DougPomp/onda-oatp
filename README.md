@@ -2,12 +2,18 @@
 
 **Teste com dois celulares:** [abrir a página experimental](https://dougpomp.github.io/onda-oatp/).
 
-1. No celular de destino, abra a página em Safari ou Chrome, toque em **Receber** e permita o microfone.
+1. Use **Abrir em outro celular** para mostrar o QR code. No celular de destino, abra a página, toque na aba **Receber**, depois em **Receber pelo microfone** e autorize o acesso.
 2. No emissor, cole uma mensagem curta como **Olá, Onda!** ou escolha um arquivo de até 4 KiB. Confira a estimativa e toque em **Transmitir**.
 3. Comece em ambiente silencioso, com volume moderado e os aparelhos próximos. Mantenha as páginas em primeiro plano. O receptor libera **Copiar mensagem** ou **Baixar arquivo** depois de verificar a integridade.
 4. Se o outro aparelho ainda estiver incompleto, toque em **Continuar com reparos**. O emissor opera sem confirmação de retorno. Você pode parar o som assim que o receptor confirmar a entrega.
 
-Conteúdo e áudio são processados nos aparelhos. O som é audível e pode ser recebido por outros aparelhos próximos. A versão é experimental. O ensaio acústico físico entre Android e iPhone está pendente.
+Conteúdo e áudio são processados nos aparelhos. Outros aparelhos próximos também podem receber a transmissão, inclusive em alta frequência.
+
+### Qual perfil escolher?
+
+Escolha o perfil apenas no emissor. Para uma troca curta em ambiente silencioso, experimente **Turbo**. Se a recepção ficar incompleta, mantenha o receptor aberto, escolha **Rápido** e toque em **Continuar com reparos**. Em um lugar com conversas ou ruído intermitente, escolha **Com ruído** para enviar um reparo extra por geração.
+
+Para experimentar tons mais agudos, selecione uma opção do grupo **Alta frequência**. Comece com uma mensagem curta para conferir se o alto-falante e o microfone dos dois aparelhos funcionam nessa faixa. Algumas pessoas conseguem ouvir esses tons.
 
 ## Desenvolvimento
 
