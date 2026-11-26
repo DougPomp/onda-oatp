@@ -11,7 +11,10 @@
 <label for="text" class="sr">Mensagem</label><textarea id="text" rows="4" placeholder="Escreva ou cole sua mensagem…">Olá, Onda!</textarea>
 <label id="picker" hidden>Escolha um arquivo de até 4 KiB<input type="file" id="file"></label>
 <label class="profile">Perfil de áudio
-<select id="profile"><option value="normal">Com ruído · reparo extra</option><option value="fast">Rápido</option><option value="fastest">Turbo · ambiente silencioso</option><option value="high">Alta frequência · experimental</option></select></label>
+<select id="profile">
+<optgroup label="Audível"><option value="normal">Com ruído · reparo extra</option><option value="fast">Rápido</option><option value="fastest">Turbo · ambiente silencioso</option></optgroup>
+<optgroup label="Alta frequência · experimental"><option value="high">Alta frequência · padrão</option><option value="high-noise">Alta frequência · com ruído</option><option value="high-fast">Alta frequência · rápido</option><option value="high-turbo">Alta frequência · turbo</option></optgroup>
+</select></label>
 <p id="highHint" hidden>Os tons de 15 a 19,5 kHz podem ser ouvidos por algumas pessoas. A recepção depende dos dois aparelhos.</p>
 <div class="meta"><span id="size"></span><span id="estimate"></span></div>
 <button class="primary" id="transmit">Transmitir</button><button class="secondary" id="repair" hidden>Continuar com reparos</button></div>

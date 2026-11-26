@@ -1,5 +1,5 @@
 import {envelope, unpack, sender, AudioReceiver, LIMIT} from './protocol.mjs';
-import {modem, RATE, GAP} from './modem.mjs';
+import {modem, RATE, GAP, usesExtraRepair} from './modem.mjs';
 
 const $ = id => document.getElementById(id);
 const fmt = n => n.toLocaleString('pt-BR');
@@ -44,9 +44,9 @@ function preview(){
   let n=Math.ceil((7+nameBytes+bytes)/64), symbols=0;
   while(n>0){const k=Math.min(n,64);symbols+=k+Math.ceil(k/2);n-=k;}
   const profile=$('profile').value;
-  $('highHint').hidden=profile!=='high';
+  $('highHint').hidden=!profile.startsWith('high');
   const frameTime=frameTimes[profile];
-  const extra=profile==='normal'?Math.ceil((7+nameBytes+bytes)/4096):0;
+  const extra=usesExtraRepair(profile)?Math.ceil((7+nameBytes+bytes)/4096):0;
   const count=1+symbols+Math.ceil(symbols/8)+extra;
   const seconds=Math.ceil(count*(frameTime+GAP)-GAP);
   $('estimate').textContent=!valid?(bytes>LIMIT?'Limite excedido':'Selecione um conteúdo válido'):
@@ -119,7 +119,7 @@ async function transmit(repair){
     }
     const profile=$('profile').value;
     const frames=repair?await prepared.repairs():prepared.initial.slice();
-    if(!repair && profile==='normal')frames.push(...await prepared.extraRound());
+    if(!repair && usesExtraRepair(profile))frames.push(...await prepared.extraRound());
     for(let i=0;i<frames.length;i++){
       if(job!==j)return;
       status(repair?'Transmitindo reparos':'Transmitindo pelo alto-falante','Quadro '+(i+1)+' de '+frames.length,i/frames.length);

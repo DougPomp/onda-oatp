@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import factory from 'ggwave';
 import {sender,Receiver,AudioReceiver,envelope,unpack} from '../web/protocol.mjs';
-import {modem} from '../web/modem.mjs';
+import {modem, usesExtraRepair} from '../web/modem.mjs';
 
-for(const profile of ['normal','high']) test('entrada tardia, repetição e reparos em PCM: '+profile,async()=>{
+for(const profile of ['normal','high','high-fast','high-turbo','high-noise']) test('entrada tardia, repetição e reparos em PCM: '+profile,async()=>{
   const api=await factory({print:()=>{}});api.disableLog();
   const tx=modem(api),rx=modem(api), receiver=new Receiver();
   const bytes=new TextEncoder().encode('Olá, Onda! 🌊');
@@ -67,12 +67,15 @@ test('perfis audíveis, compatibilidade e recuperação após interferência no 
       for(const packet of demodulate(tx.encode(frame)))await receiver.accept(packet);
     }
     assert.equal(unpack(receiver.object).text,text);
-    const rescue=new AudioReceiver();
-    // Both data frames are erased; only manifests and the automatic extra repair arrive.
-    for(const frame of [source.initial[0],source.initial.at(-1),...await source.extraRound()]){
-      for(const packet of demodulate(tx.encode(frame)))await rescue.accept(packet);
+    for(const profile of ['normal','high-noise']){
+      const rescue=new AudioReceiver();
+      assert.ok(usesExtraRepair(profile));
+      // Both data frames are erased; only manifests and the automatic extra repair arrive.
+      for(const frame of [source.initial[0],source.initial.at(-1),...await source.extraRound()]){
+        for(const packet of demodulate(tx.encode(frame,profile)))await rescue.accept(packet);
+      }
+      assert.equal(unpack(rescue.object).text,text);
     }
-    assert.equal(unpack(rescue.object).text,text);
     const legacy=api.init(api.getDefaultParameters());
     try{
       const wave=api.encode(legacy,btoa(String.fromCharCode(...source.initial[0])),api.ProtocolId.GGWAVE_PROTOCOL_AUDIBLE_NORMAL,28);

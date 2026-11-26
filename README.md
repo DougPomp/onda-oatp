@@ -35,6 +35,9 @@ O emissor envia os 100 bytes binários de cada quadro diretamente pelo ggwave 0.
 | Rápido | 6,83 s | ≈ 28 s |
 | Turbo | 3,75 s | ≈ 16 s |
 | Alta frequência (experimental, 15–19,5 kHz) | 9,90 s | ≈ 41 s |
+| Alta frequência · com ruído (um reparo extra por geração) | 9,90 s | ≈ 51 s |
+| Alta frequência · rápido | 6,83 s | ≈ 28 s |
+| Alta frequência · turbo | 3,75 s | ≈ 16 s |
 
 O receptor também detecta Alta frequência automaticamente. Algumas pessoas podem ouvir os tons e a resposta dos alto-falantes e microfones varia entre celulares.
 

@@ -1,5 +1,6 @@
 export const RATE = 48000;
 export const GAP = 0.16;
+export const usesExtraRepair = profile => profile === 'normal' || profile === 'high-noise';
 
 export function modem(api, rate = RATE) {
   const p = api.getDefaultParameters();
@@ -14,7 +15,10 @@ export function modem(api, rate = RATE) {
       const protocols = api.ProtocolId;
       const protocol = {normal: protocols.GGWAVE_PROTOCOL_AUDIBLE_NORMAL,
         fast: protocols.GGWAVE_PROTOCOL_AUDIBLE_FAST, fastest: protocols.GGWAVE_PROTOCOL_AUDIBLE_FASTEST,
-        high: protocols.GGWAVE_PROTOCOL_ULTRASOUND_NORMAL}[profile];
+        high: protocols.GGWAVE_PROTOCOL_ULTRASOUND_NORMAL,
+        'high-noise': protocols.GGWAVE_PROTOCOL_ULTRASOUND_NORMAL,
+        'high-fast': protocols.GGWAVE_PROTOCOL_ULTRASOUND_FAST,
+        'high-turbo': protocols.GGWAVE_PROTOCOL_ULTRASOUND_FASTEST}[profile];
       if (!protocol) throw Error('Perfil de áudio desconhecido.');
       const wave = api.encode(id, frame, protocol, 28);
       if (!wave.length) throw Error('O modem não gerou áudio.');
